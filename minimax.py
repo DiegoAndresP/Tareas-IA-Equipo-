@@ -103,7 +103,7 @@ if __name__=="__main__":
     disponibles = [i+1 for i in range(9)]
     jugador = "X"
     bot = "O"
-    turno = 1#randint(0, 1)
+    turno = int(input("Ingrese 0 para jugar primero, 1 para que el bot juegue primero: ").strip())
     for i in range(9): 
         imprimir_tablero(tablero)
         if i%2 == turno: 
