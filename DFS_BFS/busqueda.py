@@ -1,13 +1,18 @@
 from instancias import generar_instancias
+
 def DFS(grafo: dict, inicio: int, meta: int, visitados = []):
     print(inicio)
     if inicio == meta: 
-        return
+        return inicio
     print("->")
     visitados.append(inicio)
-    for n in grafo[inicio]: 
-        if n not in visitados: 
-            DFS(grafo, n, meta, visitados)
+    nodo = inicio
+    for adyacente in grafo[inicio]: 
+        if adyacente not in visitados: 
+            nodo = DFS(grafo, adyacente, meta, visitados)
+            if nodo == meta: 
+                break
+    return nodo
 
 def BFS(grafo: dict, inicio: int, meta: int): 
     visitados = [inicio]
