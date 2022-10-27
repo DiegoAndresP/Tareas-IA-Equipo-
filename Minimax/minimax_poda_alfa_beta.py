@@ -58,7 +58,7 @@ def turno_jugador(tablero: dict, disponibles: list, marca: str):
 def funcion_heuristica(disponibles: list)->int: 
     return len(disponibles) + 1
 
-def minimax(tablero: dict, disponibles: list, marca: str, alfa = -inf, beta = inf, Max = True): 
+def minimax_con_poda(tablero: dict, disponibles: list, marca: str, alfa = -inf, beta = inf, Max = True): 
     enemigo = "O" if marca == "X" else "X"
     if final(tablero, disponibles): 
         return {"posicion": 0, "valor": ganador(tablero, marca) * funcion_heuristica(disponibles)}
@@ -69,7 +69,7 @@ def minimax(tablero: dict, disponibles: list, marca: str, alfa = -inf, beta = in
             temp_disponibles = disponibles.copy()
             temp_disponibles.remove(num)
             tablero[num] = marca
-            valor = max(valor, minimax(tablero, temp_disponibles, marca, alfa, beta, False)["valor"])
+            valor = max(valor, minimax_con_poda(tablero, temp_disponibles, marca, alfa, beta, False)["valor"])
             alfa = max(alfa, valor)
             tablero[num] = " "
             if movimiento["valor"] != valor: 
@@ -84,7 +84,7 @@ def minimax(tablero: dict, disponibles: list, marca: str, alfa = -inf, beta = in
             temp_disponibles = disponibles.copy()
             temp_disponibles.remove(num)
             tablero[num] = enemigo
-            valor = min(valor, minimax(tablero, temp_disponibles, marca, alfa, beta, True)["valor"])
+            valor = min(valor, minimax_con_poda(tablero, temp_disponibles, marca, alfa, beta, True)["valor"])
             beta = min(beta, valor)
             tablero[num] = " "
             if movimiento["valor"] != valor: 
@@ -94,13 +94,35 @@ def minimax(tablero: dict, disponibles: list, marca: str, alfa = -inf, beta = in
                 break
     return movimiento
 
-def turno_bot(tablero: dict, disponibles: list, marca: str):
+def turno_bot_genio(tablero: dict, disponibles: list, marca: str):
     tiempo_inicio = time.time()
-    movimiento = minimax(tablero, disponibles, marca)
+    movimiento = minimax_con_poda(tablero, disponibles, marca)
     print("Movimiento: "+str(movimiento))
-    print("Tiempo de execución: "+str(time.time()-tiempo_inicio))
+    print("Tiempo de execución: "+str(time.time()-tiempo_inicio)+"s")
     tablero[movimiento["posicion"]] = marca
     disponibles.remove(movimiento["posicion"])
+
+def turno_bot_tonto(tablero: dict, disponibles: list, marca: str): 
+    mov = disponibles[randint(0, len(disponibles)-1)]
+    tablero[mov] = marca
+    disponibles.remove(mov)
+
+def validar_zero_uno()->int: 
+    while True: 
+        num = 0
+        try: 
+            num = int(input("Ingrese 0 para jugar primero, 1 para que el bot juegue primero: ").strip())
+        except ValueError: 
+            print("Ingrese un valor válido")
+        else: 
+            if num == 1 or num == 0: 
+                return num
+
+def validar_sn()->bool: 
+    sn = ""
+    while sn != "s" and sn != "n": 
+        sn = input("Desea recibir ayuda? S/n: ")
+    return sn == "s"
 
 if __name__=="__main__": 
     tablero = dict()
@@ -109,13 +131,21 @@ if __name__=="__main__":
     disponibles = [i+1 for i in range(9)]
     jugador = "X"
     bot = "O"
-    turno = int(input("Ingrese 0 para jugar primero, 1 para que el bot juegue primero: ").strip())
+    turno = validar_zero_uno()
+    ayuda = validar_sn()
     for i in range(9): 
         imprimir_tablero(tablero)
         if i%2 == turno: 
+            if ayuda: 
+                tiempo_inicio = time.time()
+                print("Mejor movimiento: "+str(minimax_con_poda(tablero, disponibles, jugador)))
+                print("Tiempo: "+str(time.time()-tiempo_inicio))
             turno_jugador(tablero, disponibles, jugador)
         else:
-            turno_bot(tablero, disponibles, bot)
+            if ayuda: 
+                turno_bot_tonto(tablero, disponibles, bot)
+            else: 
+                turno_bot_genio(tablero, disponibles, bot)
         print("-"*20)
         if i>=4 and final(tablero, disponibles): 
             break
