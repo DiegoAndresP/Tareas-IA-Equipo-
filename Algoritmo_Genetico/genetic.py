@@ -1,7 +1,5 @@
 from random import randint, randrange
 
-from base import mutation
-
 def calcular_peso(sol: str, p: list)->int: 
     peso = 0
     for i in range(len(sol)): 
