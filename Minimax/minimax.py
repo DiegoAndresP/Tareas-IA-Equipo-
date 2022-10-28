@@ -1,9 +1,6 @@
-from ast import While
 from math import inf
 from random import randint
 import time
-
-from numpy import disp
 
 def imprimir_tablero(tablero: dict): 
     print(tablero[7]+"|"+tablero[8]+"|"+tablero[9])
