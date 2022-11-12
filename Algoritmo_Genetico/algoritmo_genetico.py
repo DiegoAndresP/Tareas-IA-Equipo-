@@ -1,7 +1,7 @@
 from random import randint
 from math import inf
 
-def evaluar_peso(sol: str, w: list)->int: 
+def evaluar_peso(sol: str, w: list)->float: 
     peso = 0
     for i in range(len(sol)): 
         peso += w[i]*int(sol[i])
@@ -18,14 +18,14 @@ def generar_solucion(w: list, p_max: int)->str:
             solucion += str(randint(0, 1))
     return solucion
 
-def evaluar_beneficio(sol: str, b: list)->int: 
+def evaluar_beneficio(sol: str, b: list)->float: 
     beneficio = 0
     for i in range(len(sol)): 
         beneficio += b[i]*int(sol[i])
     return beneficio
 
 def seleccion(pob: list, b: list): 
-    n_muestra = len(pob)//20
+    n_muestra = 10
     solucion = ""
     for i in range(n_muestra): 
         muestra = pob[randint(0, len(pob)-1)]
@@ -60,8 +60,10 @@ def genetico(p_max: int, b: list, w: list, n_pob = 100, n_gen = 10):
     for p in range(n_pob): 
         poblacion.append(generar_solucion(w, p_max))
     mejor_solucion = ""
-    mejor_valor = -inf*9
+    mejor_valor = -inf
     for g in range(n_gen): 
+        mejor_solucion = ""
+        mejor_valor = -inf
         seleccionados = [seleccion(poblacion, b) for i in range(n_pob)]
         hijos = list()
         for i in range(0, n_pob, 2): 
@@ -73,12 +75,19 @@ def genetico(p_max: int, b: list, w: list, n_pob = 100, n_gen = 10):
                     mejor_solucion = hijo
                     mejor_valor = evaluar_beneficio(hijo, b)
         poblacion = hijos
+    valor = 0
+    for p in poblacion: 
+        valor += evaluar_beneficio(p, beneficios)
+    valor /= len(poblacion)
+    print("Valor promedio: "+str(valor))
     return (mejor_solucion, mejor_valor)
 
 if __name__ == "__main__":
     peso_maximo = 879
+    n_poblacion = 100
+    n_generaciones = 0
     beneficios = [91, 72, 90, 46, 55, 8, 35, 75, 61, 15, 77, 40, 63, 75, 29, 75, 17, 78, 40, 44]
-    pesos = [84, 83, 43, 4, 44, 6, 82, 92, 25, 83, 56, 18, 58, 14, 48, 70, 96, 32, 68, 82]
-    solucion, valor = genetico(peso_maximo, beneficios, pesos, 1000, 20)
+    pesos = [84, 83, 43, 4, 44, 6, 82, 92, 25, 83, 56, 18, 58, 14, 48, 70, 96, 32, 68, 92]
+    solucion, valor = genetico(peso_maximo, beneficios, pesos, n_poblacion, n_generaciones)
     print("Mejor solución: "+solucion)
     print("Mejor valor: "+str(valor))
